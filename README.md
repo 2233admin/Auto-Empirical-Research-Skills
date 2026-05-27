@@ -6,6 +6,10 @@
 
 <br/>
 
+  <img src="images/aers-readme-cover-cn.png" alt="实证研究智能体技能大全封面图" width="100%" />
+
+  <br/>
+
   <table>
     <tr>
       <td align="center">

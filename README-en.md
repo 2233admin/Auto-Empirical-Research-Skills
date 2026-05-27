@@ -6,6 +6,10 @@
 
 <br/>
 
+  <img src="images/aers-readme-cover-en.png" alt="Auto-Empirical Research Skills cover" width="100%" />
+
+  <br/>
+
   <table>
     <tr>
       <td align="center">
