@@ -40,6 +40,7 @@ CATEGORIES = {
     "causal-inference-library": "Causal-inference & treatment-effect libraries",
     "econometrics-library": "Econometrics & quasi-experimental libraries",
     "causal-discovery": "Causal discovery / structure learning",
+    "research-agent": "Autonomous research & data-science agents",
     "benchmark-dataset": "Benchmarks & datasets",
     "mcp-server": "MCP servers (data & stats execution)",
 }
@@ -48,11 +49,12 @@ CATEGORY_ORDER = [
     "causal-inference-library",
     "econometrics-library",
     "causal-discovery",
+    "research-agent",
     "mcp-server",
     "benchmark-dataset",
 ]
 MAINTAINED = {"active", "maintained", "dormant", None}
-AUTOMATION = {"library", "framework", "mcp-server", "dataset", None}
+AUTOMATION = {"library", "framework", "application", "mcp-server", "dataset", None}
 REQUIRED_KEYS = {
     "id",
     "name",
@@ -172,32 +174,35 @@ def summary_tables(tools: list[dict]) -> str:
         lic = t["license"]
         if lic in {"unverified", "NOASSERTION"}:
             by_license_class["unverified / unmapped"] += 1
+        elif any(tag in lic for tag in ("Commons Clause", "Responsible-AI", "Scientist Source", "custom")):
+            by_license_class["non-OSI / custom"] += 1
         elif lic.startswith(("GPL", "AGPL", "LGPL")):
             by_license_class["copyleft (GPL/AGPL/LGPL)"] += 1
         else:
             by_license_class["permissive (MIT/BSD/Apache/…)"] += 1
 
     lines: list[str] = []
-    lines.append(f"**{len(tools)} tools** across {len(by_cat)} categories.\n")
+    lines.append(f"**{len(tools)} tools** across {len(by_cat)} categories.")
+    lines.append("")
     lines.append("| Category | Count |")
     lines.append("|---|---:|")
     for cat in CATEGORY_ORDER:
         if by_cat.get(cat):
             lines.append(f"| {CATEGORIES[cat]} | {by_cat[cat]} |")
     lines.append("")
-    lines.append("| Language | Tools | | Maintenance | Tools | | License | Tools |")
-    lines.append("|---|---:|---|---|---:|---|---|---:|")
-    lang_rows = [f"{LANG_LABEL.get(k, k)} | {v}" for k, v in by_lang.most_common()]
+    lines.append("| By language | Tools | | By maintenance | Tools | | By license | Tools |")
+    lines.append("|---|---:|:-:|---|---:|:-:|---|---:|")
+    lang_rows = [(LANG_LABEL.get(k, k), v) for k, v in by_lang.most_common()]
     status_rows = [
-        f"{STATUS_BADGE.get(k, k)} | {v}"
+        (STATUS_BADGE.get(k, k), v)
         for k, v in sorted(by_status.items(), key=lambda kv: {"active": 0, "maintained": 1, "dormant": 2}.get(kv[0], 9))
     ]
-    lic_rows = [f"{k} | {v}" for k, v in by_license_class.most_common()]
+    lic_rows = list(by_license_class.most_common())
     for idx in range(max(len(lang_rows), len(status_rows), len(lic_rows))):
-        a = lang_rows[idx] if idx < len(lang_rows) else " | "
-        b = status_rows[idx] if idx < len(status_rows) else " | "
-        c = lic_rows[idx] if idx < len(lic_rows) else " | "
-        lines.append(f"| {a} | | {b} | | {c} |")
+        la, lv = lang_rows[idx] if idx < len(lang_rows) else ("", "")
+        sa, sv = status_rows[idx] if idx < len(status_rows) else ("", "")
+        ca, cv = lic_rows[idx] if idx < len(lic_rows) else ("", "")
+        lines.append(f"| {la} | {lv} |  | {sa} | {sv} |  | {ca} | {cv} |")
     return "\n".join(lines)
 
 
